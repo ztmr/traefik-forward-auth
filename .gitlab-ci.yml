@@ -1,0 +1,27 @@
+
+variables:
+  KANIKO_IMAGE: ideasys/kaniko:201810021813
+
+stages:
+  - dockerize
+
+dockerize:
+  stage: dockerize
+  image: ${KANIKO_IMAGE}
+  variables:
+    BUILDER_RECIPE_DIR: ${CI_PROJECT_DIR}
+    TARGET_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+    BUILDER_IMAGE_CACHE: ${CI_REGISTRY_IMAGE}/zcache
+  script:
+    - export DOCKER_CONFIG=/kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ${DOCKER_CONFIG}/config.json
+    - |
+      /kaniko/executor \
+        --context ${BUILDER_RECIPE_DIR} \
+        --dockerfile ${BUILDER_RECIPE_DIR}/Dockerfile \
+        --destination ${TARGET_IMAGE} \
+        --reproducible \
+        --cache=true \
+        --cache-repo ${BUILDER_IMAGE_CACHE}
+  dependencies: []
+
