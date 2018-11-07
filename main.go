@@ -139,6 +139,11 @@ func main() {
   emailWhitelist := flag.String("whitelist", "", "Comma separated list of emails to allow")
   prompt := flag.String("prompt", "", "Space separated list of OpenID prompt options")
 
+  scope := flag.String("scope", "", "OAuth2 Scope URL(s)")
+  loginUrlStr := flag.String("login-url", "", "OAuth2 Login URL")
+  tokenUrlStr := flag.String("token-url", "", "OAuth2 Token URL")
+  userUrlStr := flag.String("user-url", "", "OAuth2 Validate/User URL")
+
   flag.Parse()
 
   // Backwards compatability
@@ -159,6 +164,21 @@ func main() {
   if *secret == "" {
     stop = true
     log.Critical("secret must be set")
+  }
+  loginUrl, err := url.Parse(*loginUrlStr)
+  if err != nil {
+    stop = true
+    log.Critical("invalid OAuth2 Login URL")
+  }
+  tokenUrl, err := url.Parse(*tokenUrlStr)
+  if err != nil {
+    stop = true
+    log.Critical("invalid OAuth2 Token URL")
+  }
+  userUrl, err := url.Parse(*userUrlStr)
+  if err != nil {
+    stop = true
+    log.Critical("invalid OAuth2 Validate/User URL")
   }
   if stop {
     return
@@ -191,22 +211,11 @@ func main() {
 
     ClientId: *clientId,
     ClientSecret: *clientSecret,
-    Scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-    LoginURL: &url.URL{
-      Scheme: "https",
-      Host: "accounts.google.com",
-      Path: "/o/oauth2/auth",
-    },
-    TokenURL: &url.URL{
-      Scheme: "https",
-      Host: "www.googleapis.com",
-      Path: "/oauth2/v3/token",
-    },
-    UserURL: &url.URL{
-      Scheme: "https",
-      Host: "www.googleapis.com",
-      Path: "/oauth2/v2/userinfo",
-    },
+
+    Scope: *scope,
+    LoginURL: loginUrl,
+    TokenURL: tokenUrl,
+    UserURL: userUrl,
 
     CookieName: *cookieName,
     CSRFCookieName: *cSRFCookieName,

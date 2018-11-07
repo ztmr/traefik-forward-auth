@@ -20,16 +20,32 @@ services:
     labels:
       - "traefik.backend=whoami"
       - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:whoami.localhost.com"
+      - "traefik.frontend.rule=PathPrefix:/whoami"
 
   traefik-forward-auth:
-    image: thomseddon/traefik-forward-auth
+    image: traefik-forward-auth:develop
+    build: ../
     environment:
-      - CLIENT_ID=your-client-id
-      - CLIENT_SECRET=your-client-secret
+# Google:
+#      - CLIENT_ID=xxx.apps.googleusercontent.com
+#      - CLIENT_SECRET=xxx
+#      - SCOPE="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+#      - LOGIN_URL=https://accounts.google.com/o/oauth2/auth
+#      - TOKEN_URL=https://www.googleapis.com/oauth2/v3/token
+#      - USER_URL=https://www.googleapis.com/oauth2/v2/userinfo
+#
+# GitLab:
+#      - CLIENT_ID=xxx
+#      - CLIENT_SECRET=xxx
+#      - SCOPE=read_user
+#      - LOGIN_URL=https://gitlab.com/oauth/authorize
+#      - TOKEN_URL=https://gitlab.com/oauth/token
+#      - USER_URL=https://gitlab.com/api/v4/user
+#
+# Common options:
       - SECRET=something-random
       - COOKIE_SECURE=false
-      - DOMAIN=yourcompany.com
+#      - DOMAIN=yourcompany.com
     networks:
       - traefik
 

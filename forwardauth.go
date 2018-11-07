@@ -163,10 +163,7 @@ func (f *ForwardAuth) ExchangeCode(r *http.Request, code string) (string, error)
 // Get user with token
 
 type User struct {
-  Id string `json:"id"`
   Email string `json:"email"`
-  Verified bool `json:"verified_email"`
-  Hd string `json:"hd"`
 }
 
 func (f *ForwardAuth) GetUser(token string) (User, error) {
@@ -183,7 +180,6 @@ func (f *ForwardAuth) GetUser(token string) (User, error) {
   if err != nil {
     return user, err
   }
-
   defer res.Body.Close()
   err = json.NewDecoder(res.Body).Decode(&user)
 
